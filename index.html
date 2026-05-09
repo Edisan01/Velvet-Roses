@@ -406,7 +406,7 @@ footer { background:var(--cream); padding:3.5rem 4rem; display:grid; grid-templa
 <!-- ══ CTA ══ -->
 <section class="cta">
   <div class="sr fl">
-    <img src="assets/flower_shop_banner__1__edited.avif" alt="Rosen" onerror="this.style.background='rgba(255,255,255,0.15)';this.style.height='400px';this.remove()">
+    <img src="flower_shop_banner__1__edited.avif" alt="Rosen" onerror="this.style.background='rgba(255,255,255,0.15)';this.style.height='400px';this.remove()">
   </div>
   <div class="cta-txt sr fr" style="transition-delay:0.2s">
     <h2 class="wr">
@@ -826,6 +826,8 @@ document.querySelectorAll('.prod-heart').forEach(h => {
 
 /* ══ 3D ROSE ══ */
 async function init3DRose() {
+  // Auto-detect base path (works both locally and on GitHub Pages)
+  const base = window.location.pathname.replace(/\/[^/]*$/, '') + '/';
   const canvas = document.getElementById('roseCanvas');
   if (!canvas) return;
 
@@ -858,7 +860,7 @@ async function init3DRose() {
 
   // Load GLB
   const loader = new GLTFLoader();
-  loader.load('assets/rose.glb', (gltf) => {
+  loader.load('rose.glb', (gltf) => {
     const model = gltf.scene;
 
     // Center model
