@@ -245,14 +245,9 @@ footer { background:var(--cream); padding:3.5rem 4rem; display:grid; grid-templa
 }
 </style>
 
-<script type="importmap">
-{
-  "imports": {
-    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
-  }
-}
-</script>
+
+<script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
+<script src="https://unpkg.com/three@0.160.0/examples/js/loaders/GLTFLoader.js"></script>
 </head>
 <body>
 
@@ -825,96 +820,66 @@ document.querySelectorAll('.prod-heart').forEach(h => {
 
 
 /* ══ 3D ROSE ══ */
-async function init3DRose() {
-  // Auto-detect base path (works both locally and on GitHub Pages)
-  const base = window.location.pathname.replace(/\/[^/]*$/, '') + '/';
+function init3DRose() {
   const canvas = document.getElementById('roseCanvas');
   if (!canvas) return;
+  if (typeof THREE === 'undefined') { console.error('THREE not loaded'); return; }
 
-  let THREE;
-  try { THREE = await import('three'); } catch(e) { return; }
-  if (!THREE) return;
-  const { GLTFLoader } = await import('three/addons/loaders/GLTFLoader.js');
-
-  const w = canvas.offsetWidth || 400;
-  const h = canvas.offsetHeight || 360;
+  const w = canvas.parentElement.offsetWidth || 400;
+  const h = canvas.parentElement.offsetHeight || 360;
 
   const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
   renderer.setSize(w, h);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
-  renderer.shadowMap.enabled = true;
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(45, w / h, 0.1, 100);
   camera.position.set(0, 0.5, 3.5);
 
-  // Lighting
-  scene.add(new THREE.AmbientLight(0xffffff, 1.2));
-  const dir = new THREE.DirectionalLight(0xfff0e0, 2);
-  dir.position.set(2, 4, 3);
-  scene.add(dir);
-  const fill = new THREE.DirectionalLight(0xe8d0c0, 0.8);
-  fill.position.set(-2, 1, -2);
-  scene.add(fill);
+  scene.add(new THREE.AmbientLight(0xffffff, 1.5));
+  const dir = new THREE.DirectionalLight(0xfff0e0, 2.5);
+  dir.position.set(2, 4, 3); scene.add(dir);
+  const fill = new THREE.DirectionalLight(0xe8d0c0, 1);
+  fill.position.set(-2, 1, -2); scene.add(fill);
 
-  // Load GLB
-  const loader = new GLTFLoader();
-  loader.load('rose.glb', (gltf) => {
+  const loader = new THREE.GLTFLoader();
+  const base = window.location.href.replace(/\/[^/]*$/, '/');
+  loader.load(base + 'rose.glb', (gltf) => {
     const model = gltf.scene;
-
-    // Center model
     const box = new THREE.Box3().setFromObject(model);
     const center = box.getCenter(new THREE.Vector3());
     const size = box.getSize(new THREE.Vector3());
-    const maxDim = Math.max(size.x, size.y, size.z);
     model.position.sub(center);
-    model.scale.setScalar(2.2 / maxDim);
-
-    // Start rotation
-    model.rotation.y = -Math.PI; // start rotated away
+    model.scale.setScalar(2.2 / Math.max(size.x, size.y, size.z));
+    model.rotation.y = -Math.PI;
     scene.add(model);
-
-    // Show canvas
     canvas.style.opacity = '1';
 
-    // Animate spin-in: rotate from -180° to 0° over 1.5s
-    const startTime = performance.now();
-    const spinDuration = 1500;
-
-    function spinIn(now) {
-      const elapsed = now - startTime;
-      const p = Math.min(elapsed / spinDuration, 1);
-      const ease = 1 - Math.pow(1 - p, 3);
-      model.rotation.y = -Math.PI + (Math.PI * ease);
+    const t0 = performance.now();
+    const spinDur = 1500;
+    function animate(now) {
+      const p = Math.min((now - t0) / spinDur, 1);
+      model.rotation.y = -Math.PI + Math.PI * (1 - Math.pow(1-p, 3));
       renderer.render(scene, camera);
-
-      if (p < 1) {
-        requestAnimationFrame(spinIn);
-      } else {
-        // Spin complete – slow auto-rotate + crossfade to photo after 2s
-        model.rotation.y = 0;
-        let autoAngle = 0;
-
-        function autoRotate() {
-          autoAngle += 0.004;
-          model.rotation.y = autoAngle;
-          renderer.render(scene, camera);
-          requestAnimationFrame(autoRotate);
-        }
-        autoRotate();
-
-        // Crossfade to real photo after 2.5s
-        setTimeout(() => {
-          canvas.style.opacity = '0';
-          const photo = document.getElementById('rosePhoto');
-          if (photo) photo.style.opacity = '1';
-        }, 2500);
-      }
+      if (p < 1) { requestAnimationFrame(animate); return; }
+      model.rotation.y = 0;
+      let angle = 0;
+      (function loop() {
+        angle += 0.005; model.rotation.y = angle;
+        renderer.render(scene, camera);
+        requestAnimationFrame(loop);
+      })();
+      setTimeout(() => {
+        canvas.style.opacity = '0';
+        const photo = document.getElementById('rosePhoto');
+        if (photo) photo.style.opacity = '1';
+      }, 2500);
     }
-    requestAnimationFrame(spinIn);
-  });
+    requestAnimationFrame(animate);
+  }, undefined, (err) => console.error('GLB error:', err));
 }
+
 /* ══ CLICK MAGIC – saisonale Elemente beim Klicken ══ */
 const CLICK_ITEMS = {
   muttertag:    ['🌹','🌸','🌷','💐'],
