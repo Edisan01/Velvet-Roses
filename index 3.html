@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VelvetRoses Wien</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Outfit:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --sage: #8B9A6E;
+  --sage-light: #B5C49A;
+  --sage-dark: #2C3B22;
+  --orange: #D4855A;
+  --cream: #F5F0E8;
+  --warm-white: #FAFAF7;
+  --dark: #1A1A18;
+  --muted: #8A8A82;
+  --border: #E5E0D8;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body { font-family:'Outfit',sans-serif; background:var(--warm-white); color:var(--dark); overflow-x:hidden; }
+
+/* LOADER */
+.loader { position:fixed; inset:0; background:var(--sage); display:flex; align-items:center; justify-content:center; z-index:999; transition:opacity 0.9s ease,visibility 0.9s ease; }
+.loader.gone { opacity:0; visibility:hidden; pointer-events:none; }
+.loader-word { font-family:'Cormorant Garamond',serif; font-size:clamp(2rem,5vw,3.5rem); font-weight:300; color:white; letter-spacing:0.12em; }
+.loader-word span { display:inline-block; opacity:0; transform:translateY(40px); animation:charUp 0.45s ease forwards; }
+@keyframes charUp { to { opacity:1; transform:translateY(0); } }
+
+/* NAV */
+nav { position:fixed; top:0; left:0; right:0; z-index:100; display:flex; align-items:center; justify-content:space-between; padding:1.4rem 4rem; background:rgba(250,250,247,0.92); backdrop-filter:blur(16px); border-bottom:1px solid var(--border); opacity:0; transform:translateY(-100%); transition:opacity 0.7s ease,transform 0.7s ease; }
+nav.on { opacity:1; transform:translateY(0); }
+.logo { font-family:'Cormorant Garamond',serif; font-size:1.5rem; font-weight:500; color:var(--dark); text-decoration:none; letter-spacing:0.05em; }
+.nav-links { display:flex; gap:2.5rem; list-style:none; }
+.nav-links a { font-size:0.82rem; font-weight:400; letter-spacing:0.08em; text-transform:uppercase; color:var(--dark); text-decoration:none; transition:color 0.3s; }
+.nav-links a:hover { color:var(--sage); }
+.nav-cta { background:var(--dark)!important; color:white!important; padding:0.55rem 1.4rem; border-radius:100px; transition:background 0.3s!important; }
+.nav-cta:hover { background:var(--sage)!important; }
+
+/* WORD REVEAL */
+.wr .w { display:inline-block; opacity:0; transform:translateY(26px); transition:opacity 0.55s ease,transform 0.55s ease; }
+.wr .w.on { opacity:1; transform:translateY(0); }
+
+/* SCROLL REVEAL */
+.sr { opacity:0; transform:translateY(38px); transition:opacity 0.75s cubic-bezier(0.16,1,0.3,1),transform 0.75s cubic-bezier(0.16,1,0.3,1); }
+.sr.fl { transform:translateX(-45px); }
+.sr.fr { transform:translateX(45px); }
+.sr.on { opacity:1; transform:translate(0); }
+
+/* BTN */
+.btn { display:inline-flex; align-items:center; gap:0.4rem; padding:0.85rem 1.8rem; border-radius:100px; font-family:'Outfit',sans-serif; font-size:0.88rem; font-weight:500; text-decoration:none; cursor:pointer; border:none; transition:transform 0.25s,box-shadow 0.25s,background 0.25s; }
+.btn:hover { transform:translateY(-2px); }
+.btn.w { background:white; color:var(--dark); }
+.btn.w:hover { box-shadow:0 8px 25px rgba(0,0,0,0.18); }
+.btn.g { background:transparent; color:white; border:1px solid rgba(255,255,255,0.4); }
+.btn.g:hover { background:rgba(255,255,255,0.1); }
+.btn.d { background:var(--dark); color:white; }
+.btn.d:hover { background:var(--sage-dark); box-shadow:0 8px 25px rgba(0,0,0,0.2); }
+
+/* ══ HERO ══ */
+.hero { min-height:100vh; background:var(--sage); padding:130px 4rem 5rem; position:relative; overflow:hidden; }
+
+.hero-swirl { position:absolute; top:8rem; right:5rem; width:130px; opacity:0; pointer-events:none; transition:opacity 1s ease 1.8s; }
+.hero-swirl.on { opacity:0.3; }
+
+.hero-banner { display:inline-flex; align-items:center; gap:0.5rem; background:rgba(255,255,255,0.17); border:1px solid rgba(255,255,255,0.32); color:white; padding:0.38rem 1.3rem; border-radius:100px; font-size:0.76rem; letter-spacing:0.1em; text-transform:uppercase; margin-bottom:2rem; opacity:0; transform:translateY(-12px); transition:opacity 0.5s ease,transform 0.5s ease; }
+.hero-banner.on { opacity:1; transform:translateY(0); }
+
+.hero-title { font-family:'Cormorant Garamond',serif; font-size:clamp(3rem,6.5vw,5.8rem); font-weight:300; color:white; line-height:1.05; letter-spacing:-0.01em; max-width:650px; margin-bottom:2.5rem; position:relative; z-index:2; }
+.hero-title em { font-style:italic; }
+
+/* 3-col grid */
+.hgrid { display:grid; grid-template-columns:1fr 1.2fr 1fr; gap:1.2rem; align-items:end; }
+
+/* LEFT */
+.hcol-l { display:flex; flex-direction:column; gap:0.9rem; }
+.h-avrow { display:flex; align-items:center; gap:0.8rem; opacity:0; transform:translateY(20px); transition:opacity 0.6s ease,transform 0.6s ease; }
+.h-avrow.on { opacity:1; transform:translateY(0); }
+.h-av { width:46px; height:46px; border-radius:50%; background:rgba(255,255,255,0.22); border:2px solid rgba(255,255,255,0.45); overflow:hidden; flex-shrink:0; }
+.h-av img { width:100%; height:100%; object-fit:cover; }
+.h-browse { color:white; font-size:0.8rem; line-height:1.4; opacity:0.82; }
+
+.h-photo { border-radius:16px; overflow:hidden; height:190px; position:relative; opacity:0; transform:translateY(30px); transition:opacity 0.7s ease,transform 0.7s ease; }
+.h-photo.on { opacity:1; transform:translateY(0); }
+.h-photo img { width:100%; height:100%; object-fit:cover; display:block; }
+.h-photo-info { position:absolute; bottom:0; left:0; right:0; padding:0.75rem 1rem; background:linear-gradient(transparent,rgba(0,0,0,0.52)); color:white; display:flex; justify-content:space-between; align-items:flex-end; }
+.h-photo-info span { font-size:0.76rem; }
+.h-photo-badge { background:rgba(255,255,255,0.9); color:var(--dark); border-radius:100px; padding:0.18rem 0.55rem; font-size:0.65rem; font-weight:600; }
+
+/* MIDDLE – spinning rose */
+.hcol-m { position:relative; }
+.h-rose { border-radius:18px; overflow:hidden; height:360px; position:relative; margin-bottom:18px; }
+.h-rose.on { opacity:1; }
+.h-rose img { width:100%; height:100%; object-fit:cover; display:block; }
+.h-overlay { position:absolute; bottom:0; left:0; right:0; padding:1.1rem; background:linear-gradient(transparent,rgba(0,0,0,0.52)); color:white; }
+.h-overlay h3 { font-family:'Cormorant Garamond',serif; font-size:1.05rem; font-weight:400; }
+.h-overlay p { font-size:0.76rem; opacity:0.8; margin-top:0.12rem; }
+
+.h-mbtns { display:flex; gap:0.55rem; justify-content:center; opacity:0; transform:translateY(14px); transition:opacity 0.5s ease,transform 0.5s ease; }
+.h-mbtns.on { opacity:1; transform:translateY(0); }
+.h-ibtn { width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:0.95rem; transition:transform 0.25s; }
+.h-ibtn:hover { transform:scale(1.12); }
+.h-ibtn.lt { background:rgba(255,255,255,0.2); color:white; }
+.h-ibtn.dk { background:var(--sage-dark); color:white; }
+
+/* RIGHT */
+.hcol-r { display:flex; flex-direction:column; gap:1.2rem; padding-bottom:0.8rem; }
+.h-circles { position:relative; height:105px; opacity:0; transform:translateY(20px); transition:opacity 0.6s ease,transform 0.6s ease; }
+.h-circles.on { opacity:1; transform:translateY(0); }
+.h-circle { width:88px; height:88px; border-radius:50%; overflow:hidden; border:3px solid rgba(139,154,110,0.6); position:absolute; background:rgba(255,255,255,0.15); }
+.h-circle:nth-child(1) { left:0; z-index:2; }
+.h-circle:nth-child(2) { left:52px; z-index:1; }
+.h-circle img { width:100%; height:100%; object-fit:cover; }
+.h-tbadge { position:absolute; bottom:2px; left:8px; background:rgba(255,255,255,0.92); border-radius:100px; padding:0.22rem 0.65rem; font-size:0.66rem; font-weight:500; white-space:nowrap; z-index:3; }
+
+.h-stats { color:white; opacity:0; transform:translateY(20px); transition:opacity 0.6s ease,transform 0.6s ease; }
+.h-stats.on { opacity:1; transform:translateY(0); }
+.h-stats-sub { font-size:0.76rem; opacity:0.62; margin-bottom:0.7rem; }
+.h-stats-row { display:flex; gap:2rem; }
+.h-stat-num { font-family:'Cormorant Garamond',serif; font-size:2.2rem; font-weight:300; display:block; line-height:1; }
+.h-stat-lbl { font-size:0.68rem; opacity:0.58; letter-spacing:0.06em; text-transform:uppercase; }
+
+/* Hero bottom elements */
+.h-scroll { position:absolute; bottom:2.5rem; left:50%; transform:translateX(-50%); width:42px; height:42px; border-radius:50%; background:rgba(255,255,255,0.2); display:flex; align-items:center; justify-content:center; color:white; text-decoration:none; font-size:1rem; opacity:0; transition:opacity 0.5s ease,background 0.3s; }
+.h-scroll.on { opacity:1; }
+.h-scroll:hover { background:rgba(255,255,255,0.35); }
+
+.h-badge { position:absolute; bottom:3.5rem; right:4rem; background:white; border-radius:100px; padding:0.72rem 1.3rem; display:flex; align-items:center; gap:0.75rem; box-shadow:0 8px 28px rgba(0,0,0,0.14); opacity:0; transform:translateY(14px); transition:opacity 0.6s ease,transform 0.6s ease; }
+.h-badge.on { opacity:1; transform:translateY(0); }
+.avs { display:flex; }
+.av { width:26px; height:26px; border-radius:50%; border:2px solid white; margin-left:-6px; background:var(--sage-light); }
+.av:first-child { margin-left:0; }
+.av2 { background:#c4b8a8; }
+.av3 { background:#a8c4b8; }
+.h-badge-txt strong { display:block; font-size:0.8rem; font-weight:600; }
+.h-badge-stars { color:#F0B429; font-size:0.68rem; }
+
+.h-actions { position:absolute; bottom:3.5rem; left:4rem; display:flex; gap:1rem; align-items:center; opacity:0; transform:translateY(14px); transition:opacity 0.6s ease,transform 0.6s ease; }
+.h-actions.on { opacity:1; transform:translateY(0); }
+
+/* ══ FEATURES ══ */
+.features { padding:7rem 4rem; background:var(--cream); }
+.sec-head { display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:3.5rem; }
+.sec-title { font-family:'Cormorant Garamond',serif; font-size:clamp(2.3rem,3.8vw,3.3rem); font-weight:400; line-height:1.1; }
+.sec-sub { font-size:0.84rem; color:var(--muted); max-width:270px; line-height:1.6; text-align:right; }
+.feat-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:1.5rem; align-items:start; }
+.feat-card { background:white; border-radius:22px; padding:2.2rem; }
+.feat-card:nth-child(2) { margin-top:2.5rem; }
+.feat-card.dk { background:var(--sage); color:white; }
+.feat-icon { width:44px; height:44px; border-radius:50%; background:var(--cream); display:flex; align-items:center; justify-content:center; font-size:1.1rem; margin-bottom:1.4rem; }
+.feat-card.dk .feat-icon { background:rgba(255,255,255,0.2); }
+.feat-card h3 { font-family:'Cormorant Garamond',serif; font-size:1.32rem; font-weight:500; line-height:1.2; margin-bottom:0.65rem; }
+.feat-card p { font-size:0.87rem; line-height:1.65; color:var(--muted); }
+.feat-card.dk p { color:rgba(255,255,255,0.72); }
+
+/* ══ CTA ══ */
+.cta { background:var(--orange); padding:5.5rem 4rem; display:grid; grid-template-columns:1fr 1fr; gap:5rem; align-items:center; position:relative; overflow:hidden; }
+.cta img { width:100%; max-width:430px; border-radius:22px; display:block; box-shadow:0 20px 50px rgba(0,0,0,0.18); }
+.cta-txt { color:white; }
+.cta-txt h2 { font-family:'Cormorant Garamond',serif; font-size:clamp(2.3rem,3.8vw,3.7rem); font-weight:400; line-height:1.1; margin-bottom:1.3rem; }
+.cta-txt h2 em { font-style:italic; }
+.cta-txt p { font-size:0.9rem; line-height:1.72; opacity:0.85; margin-bottom:2rem; max-width:390px; }
+.cta-meta { margin-top:1.8rem; font-size:0.8rem; opacity:0.7; line-height:1.85; }
+.cta-deco { position:absolute; right:2rem; bottom:1rem; font-size:4rem; opacity:0.09; pointer-events:none; }
+
+/* ══ PRODUCTS ══ */
+.products { padding:7rem 4rem; background:var(--warm-white); }
+.prod-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1.4rem; margin-top:3.5rem; align-items:start; }
+.prod-card { background:white; border-radius:18px; overflow:hidden; cursor:pointer; transition:box-shadow 0.35s; }
+.prod-card:hover { box-shadow:0 14px 45px rgba(0,0,0,0.1); }
+.prod-card:nth-child(2) { margin-top:2rem; }
+.prod-card:nth-child(4) { margin-top:1rem; }
+.prod-img { position:relative; overflow:hidden; }
+.prod-img img { width:100%; height:195px; object-fit:cover; display:block; transition:transform 0.55s ease; }
+.prod-card:hover .prod-img img { transform:scale(1.06); }
+.prod-heart { position:absolute; top:0.7rem; right:0.7rem; width:29px; height:29px; border-radius:50%; background:white; display:flex; align-items:center; justify-content:center; font-size:0.82rem; cursor:pointer; transition:transform 0.25s; }
+.prod-heart:hover { transform:scale(1.25); }
+.prod-info { padding:1.15rem; }
+.prod-info h3 { font-family:'Cormorant Garamond',serif; font-size:1.08rem; font-weight:500; margin-bottom:0.22rem; }
+.prod-sub { font-size:0.77rem; color:var(--muted); margin-bottom:0.65rem; }
+.prod-price { font-weight:600; font-size:0.93rem; color:var(--sage-dark); }
+
+/* ══ NEWSLETTER ══ */
+.nl { background:var(--sage-dark); padding:5.5rem 4rem; display:grid; grid-template-columns:1fr 1fr; gap:4rem; align-items:center; }
+.nl-title { font-family:'Cormorant Garamond',serif; font-size:clamp(2.3rem,4vw,3.8rem); font-weight:300; color:white; line-height:1.05; }
+.nl-title em { font-style:italic; }
+.nl-sub { color:rgba(255,255,255,0.52); font-size:0.87rem; margin-top:0.7rem; }
+.nl-form { display:flex; background:white; border-radius:100px; overflow:hidden; padding:0.38rem 0.38rem 0.38rem 1.4rem; align-items:center; }
+.nl-form input { flex:1; border:none; outline:none; font-family:'Outfit',sans-serif; font-size:0.87rem; background:transparent; }
+.nl-form button { background:var(--dark); color:white; border:none; border-radius:100px; padding:0.72rem 1.35rem; font-family:'Outfit',sans-serif; font-size:0.8rem; cursor:pointer; transition:background 0.3s; }
+.nl-form button:hover { background:var(--sage); }
+
+/* ══ FOOTER ══ */
+footer { background:var(--cream); padding:3.5rem 4rem; display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:3rem; border-top:1px solid var(--border); }
+.foot-brand p { font-size:0.82rem; color:var(--muted); line-height:1.7; margin-top:0.8rem; max-width:255px; }
+.foot-col h4 { font-size:0.77rem; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; margin-bottom:1rem; }
+.foot-col ul { list-style:none; }
+.foot-col li { margin-bottom:0.42rem; }
+.foot-col a { font-size:0.82rem; color:var(--muted); text-decoration:none; transition:color 0.25s; }
+.foot-col a:hover { color:var(--sage); }
+.foot-bar { background:var(--cream); padding:1rem 4rem; border-top:1px solid var(--border); display:flex; justify-content:space-between; font-size:0.77rem; color:var(--muted); }
+
+/* PETALS */
+.petal { position:fixed; top:-30px; pointer-events:none; z-index:50; opacity:0.65; animation:petalFall linear infinite; }
+@keyframes petalFall { 0%{transform:translateY(-30px) rotate(0deg) translateX(0);opacity:0.65} 50%{transform:translateY(50vh) rotate(180deg) translateX(18px)} 100%{transform:translateY(110vh) rotate(360deg) translateX(-8px);opacity:0} }
+
+@media (max-width:768px) {
+  nav { padding:1rem 1.5rem; }
+  .nav-links { display:none; }
+  .hero { padding:100px 1.5rem 8rem; min-height:auto; }
+  .hero-swirl { display:none; }
+  .hero-title { font-size:clamp(2.4rem,10vw,3.5rem); margin-bottom:2rem; max-width:100%; }
+  .hgrid { grid-template-columns:1fr; gap:1rem; }
+  .hcol-l { display:none; }
+  .hcol-r { display:none; }
+  .h-rose { height:280px; margin-bottom:1rem; }
+  .h-actions { position:static; margin-top:2rem; flex-direction:column; align-items:stretch; opacity:1; transform:none; }
+  .h-actions .btn { justify-content:center; }
+  .h-badge { position:static; margin-top:1.2rem; }
+  .h-scroll { display:none; }
+  .features { padding:4rem 1.5rem; }
+  .sec-head { flex-direction:column; gap:1rem; align-items:flex-start; }
+  .sec-sub { text-align:left; max-width:100%; }
+  .feat-grid { grid-template-columns:1fr; gap:1rem; }
+  .feat-card:nth-child(2) { margin-top:0; }
+  .cta { grid-template-columns:1fr; gap:2.5rem; padding:4rem 1.5rem; }
+  .cta img { max-width:100%; }
+  .cta-deco { display:none; }
+  .products { padding:4rem 1.5rem; }
+  .prod-grid { grid-template-columns:1fr 1fr; gap:1rem; }
+  .prod-card:nth-child(2) { margin-top:0; }
+  .prod-card:nth-child(4) { margin-top:0; }
+  .nl { grid-template-columns:1fr; gap:2rem; padding:4rem 1.5rem; }
+  footer { grid-template-columns:1fr 1fr; gap:2rem; padding:3rem 1.5rem; }
+  .foot-brand { grid-column:1/-1; }
+  .foot-bar { flex-direction:column; gap:0.5rem; padding:1rem 1.5rem; text-align:center; }
+}
+@media (max-width:480px) {
+  .prod-grid { grid-template-columns:1fr; }
+  footer { grid-template-columns:1fr; }
+  .h-rose { height:240px; }
+}
+</style>
+
+
+<script src="https://unpkg.com/three@0.149.0/build/three.min.js"></script>
+<script src="https://unpkg.com/three@0.149.0/examples/js/loaders/GLTFLoader.js"></script>
+</head>
+<body>
+
+<div class="loader" id="loader"><div class="loader-word" id="lword"></div></div>
+
+<nav id="nav">
+  <a href="#" class="logo">VelvetRoses.</a>
+  <ul class="nav-links">
+    <li><a href="#products">Produkte</a></li>
+    <li><a href="#about">Über uns</a></li>
+    <li><a href="#contact">Kontakt</a></li>
+    <li><a href="tel:+436609977699" class="nav-cta">Jetzt bestellen</a></li>
+  </ul>
+</nav>
+
+<!-- ══ HERO ══ -->
+<section class="hero">
+
+  <svg class="hero-swirl" id="hSwirl" viewBox="0 0 130 90" fill="none">
+    <path d="M10 75 C 35 8, 90 8, 118 42 C 95 62, 62 68, 40 52" stroke="white" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+    <circle cx="118" cy="42" r="3" fill="white" opacity="0.6"/>
+  </svg>
+
+  <div class="hero-banner" id="hBanner">🌸 Muttertag – Lieferung am selben Tag</div>
+
+  <h1 class="hero-title wr" id="hTitle">
+    <span class="w">Blumen,</span>&nbsp;
+    <span class="w">die</span>&nbsp;
+    <span class="w"><em>Herzen</em></span>&nbsp;
+    <span class="w">berühren.</span>
+  </h1>
+
+  <div class="hgrid">
+
+    <!-- LEFT -->
+    <div class="hcol-l">
+      <div class="h-avrow" id="hAvrow">
+        <div class="h-av">
+          <img src="https://static.wixstatic.com/media/87c1ff_d0b4eb9afd4443a6abda4d64b7c5e9f6~mv2.jpg/v1/fill/w_100,h_100,al_c,q_80/photo.jpg" alt="" onerror="this.remove()">
+        </div>
+        <p class="h-browse">Entdecken Sie unsere<br>Rosen-Kollektion</p>
+      </div>
+      <div class="h-photo" id="hPhoto">
+        <img src="https://static.wixstatic.com/media/87c1ff_d0b4eb9afd4443a6abda4d64b7c5e9f6~mv2.jpg/v1/fill/w_600,h_400,al_c,q_80/photo.jpg" alt="Rosen" onerror="this.parentElement.style.background='#a8b890';this.remove()">
+        <div class="h-photo-info">
+          <span>Frische Rosen</span>
+          <span class="h-photo-badge">ab € 4,–</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- MIDDLE – 3D Rose + crossfade to photo -->
+    <div class="hcol-m">
+      <div class="h-rose" id="hRose" style="position:relative;overflow:hidden;">
+        <!-- Three.js canvas -->
+        <canvas id="roseCanvas" style="position:absolute;inset:0;width:100%;height:100%;z-index:2;opacity:0;transition:opacity 0.8s ease;"></canvas>
+        <!-- Real photo behind -->
+        <img id="rosePhoto" src="https://static.wixstatic.com/media/87c1ff_8c795a3cd93b49969b72f446a83c149f~mv2.jpg/v1/fill/w_600,h_600,al_c,q_80/photo.jpg" alt="Rose" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;opacity:0;transition:opacity 1.2s ease;" onerror="this.parentElement.style.background='#c4b890';this.remove()">
+        <div class="h-overlay" style="position:absolute;bottom:0;left:0;right:0;z-index:3;"><h3>Rosentraum</h3><p>ab € 30,–</p></div>
+      </div>
+      <div class="h-mbtns" id="hMbtns">
+        <div class="h-ibtn lt">✦</div>
+        <div class="h-ibtn dk">↗</div>
+      </div>
+    </div>
+
+    <!-- RIGHT -->
+    <div class="hcol-r">
+      <div class="h-circles" id="hCircles">
+        <div class="h-circle">
+          <img src="https://static.wixstatic.com/media/87c1ff_77c36319fe8741b28b70bbed12ab26e8~mv2.jpg/v1/fill/w_200,h_200,al_c,q_80/photo.jpg" alt="" onerror="this.remove()">
+        </div>
+        <div class="h-circle">
+          <img src="https://static.wixstatic.com/media/87c1ff_cdefb0dbf6ec45a9aac0953e04403cb8~mv2.jpg/v1/fill/w_200,h_200,al_c,q_80/photo.jpg" alt="" onerror="this.remove()">
+        </div>
+        <div class="h-tbadge">▶ Mehr ansehen</div>
+      </div>
+      <div class="h-stats" id="hStats">
+        <p class="h-stats-sub">Rosen für besondere Momente</p>
+        <div class="h-stats-row">
+          <div>
+            <span class="h-stat-num"><span class="cnt" data-t="6000">0</span>+</span>
+            <span class="h-stat-lbl">Rosen lagernd</span>
+          </div>
+          <div>
+            <span class="h-stat-num"><span class="cnt" data-t="500">0</span>+</span>
+            <span class="h-stat-lbl">Sträuße täglich</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <a href="#about" class="h-scroll" id="hScroll">↓</a>
+
+  <!-- Mobile stats -->
+  <div class="h-mobile-stats" id="hMobileStats" style="display:none">
+    <div><span class="h-stat-num"><span class="cnt" data-t="6000">0</span>+</span><span class="h-stat-lbl">Rosen lagernd</span></div>
+    <div><span class="h-stat-num"><span class="cnt" data-t="500">0</span>+</span><span class="h-stat-lbl">Sträuße täglich</span></div>
+  </div>
+
+  <div class="h-badge" id="hBadge">
+    <div class="avs">
+      <div class="av"></div>
+      <div class="av av2"></div>
+      <div class="av av3"></div>
+    </div>
+    <div class="h-badge-txt">
+      <strong>Zufriedene Kunden</strong>
+      <span class="h-badge-stars">★★★★★ Wien 1020</span>
+    </div>
+  </div>
+
+  <div class="h-actions" id="hActions">
+    <a href="https://www.velvetroses.at/blank-2" class="btn w">Jetzt bestellen ↗</a>
+    <a href="tel:+436609977699" class="btn g">+43 660 997 7699</a>
+  </div>
+
+</section>
+
+<!-- ══ FEATURES ══ -->
+<section class="features" id="about">
+  <div class="sec-head">
+    <h2 class="sec-title wr">
+      <span class="w">Warum</span>&nbsp;
+      <span class="w">VelvetRoses</span>&nbsp;
+      <span class="w">Wien?</span>
+    </h2>
+    <p class="sec-sub sr fr">Frische Blumen, persönlicher Service und Lieferung noch am selben Tag.</p>
+  </div>
+  <div class="feat-grid">
+    <div class="feat-card sr">
+      <div class="feat-icon">🚗</div>
+      <h3>Lieferung am selben Tag</h3>
+      <p>Bestellen Sie vor 10 Uhr – Ihre Blumen kommen noch heute in ganz Wien an.</p>
+    </div>
+    <div class="feat-card sr" style="transition-delay:0.15s">
+      <div class="feat-icon">🌹</div>
+      <h3>Premiumqualität direkt vom Markt</h3>
+      <p>Täglich frisch vom Wiener Blumenmarkt. Über 6.000 Rosen und 500 Sträuße immer verfügbar.</p>
+    </div>
+    <div class="feat-card dk sr" style="transition-delay:0.3s">
+      <div class="feat-icon">✨</div>
+      <h3>Individuelles Design für jeden Anlass</h3>
+      <p>Hochzeit, Geburtstag, Muttertag, Entschuldigung – wir gestalten Ihren perfekten Strauß.</p>
+      <a href="https://www.velvetroses.at/blank-1" class="btn w" style="margin-top:1.4rem;font-size:0.82rem">Kontakt ↗</a>
+    </div>
+  </div>
+</section>
+
+<!-- ══ CTA ══ -->
+<section class="cta">
+  <div class="sr fl">
+    <img src="flower_shop_banner__1__edited.avif" alt="Rosen" onerror="this.style.background='rgba(255,255,255,0.15)';this.style.height='400px';this.remove()">
+  </div>
+  <div class="cta-txt sr fr" style="transition-delay:0.2s">
+    <h2 class="wr">
+      <span class="w">Für</span>&nbsp;<span class="w">jeden</span>&nbsp;<span class="w"><em>Moment</em></span>&nbsp;<span class="w">die</span>&nbsp;<span class="w">richtigen</span>&nbsp;<span class="w">Blumen.</span>
+    </h2>
+    <p>Besuchen Sie uns in der Taborstraße 39a im 2. Bezirk, oder bestellen Sie bequem online. Lieferung an Ihre Wunschadresse in ganz Wien.</p>
+    <div style="display:flex;gap:1rem;flex-wrap:wrap">
+      <a href="https://www.velvetroses.at/blank-2" class="btn w">Alle Produkte</a>
+      <a href="https://www.velvetroses.at/blank-1" class="btn g">Kontakt</a>
+    </div>
+    <div class="cta-meta">🕖 Mo–Do 10–19 | Fr 9–19 | So 10–18<br>🗣️ DE · EN · RU · UA<br>📍 Taborstraße 39a, 1020 Wien</div>
+  </div>
+  <div class="cta-deco">🌹</div>
+</section>
+
+<!-- ══ PRODUCTS ══ -->
+<section class="products" id="products">
+  <div class="sec-head">
+    <h2 class="sec-title wr">
+      <span class="w">Unsere</span>&nbsp;<span class="w">beliebtesten</span>&nbsp;<span class="w">Sträuße</span>
+    </h2>
+    <a href="https://www.velvetroses.at/blank-2" class="btn d sr fr">Alle Produkte ↗</a>
+  </div>
+  <div class="prod-grid">
+    <div class="prod-card sr" style="transition-delay:0s;">
+      <a href="https://www.velvetroses.at/product-page/rote-rosen-einzeln" target="_blank" style="text-decoration:none;color:inherit;">
+      <div class="prod-img">
+        <img src="https://static.wixstatic.com/media/87c1ff_b9fd3fb5883f4a91bf6725c8da53a157~mv2.jpg/v1/fill/w_400,h_300,al_c,q_80/photo.jpg" alt="Rote Rosen" onerror="this.parentElement.style.background='#c8d4a8';this.parentElement.style.height='195px';this.remove()">
+        <div class="prod-heart">🤍</div>
+      </div>
+      <div class="prod-info"><h3>Rote Rosen</h3><p class="prod-sub">Einzeln ab</p><span class="prod-price">€ 4,00</span></div>
+      </a>
+    </div>
+    <div class="prod-card sr" style="transition-delay:0.12s;margin-top:2rem;">
+      <a href="https://www.velvetroses.at/product-page/wei%C3%9Fe-rosen-einzeln" target="_blank" style="text-decoration:none;color:inherit;">
+      <div class="prod-img">
+        <img src="https://static.wixstatic.com/media/87c1ff_1a9a0ef45e374be09d3d6560df02a27b~mv2.jpg/v1/fill/w_400,h_300,al_c,q_80/photo.jpg" alt="Weiße Rosen" onerror="this.parentElement.style.background='#c8d4a8';this.parentElement.style.height='195px';this.remove()">
+        <div class="prod-heart">🤍</div>
+      </div>
+      <div class="prod-info"><h3>Weiße Rosen</h3><p class="prod-sub">Einzeln ab</p><span class="prod-price">€ 4,00</span></div>
+      </a>
+    </div>
+    <div class="prod-card sr" style="transition-delay:0.24s;">
+      <a href="https://www.velvetroses.at/product-page/samttraum-rosen-einzeln-1" target="_blank" style="text-decoration:none;color:inherit;">
+      <div class="prod-img">
+        <img src="https://static.wixstatic.com/media/87c1ff_d542fa77eee446f4adbcc5f03fc205da~mv2.jpg/v1/fill/w_400,h_300,al_c,q_80/photo.jpg" alt="Samttraum Rosen" onerror="this.parentElement.style.background='#c8d4a8';this.parentElement.style.height='195px';this.remove()">
+        <div class="prod-heart">🤍</div>
+      </div>
+      <div class="prod-info"><h3>Samttraum Rosen</h3><p class="prod-sub">Einzeln ab</p><span class="prod-price">€ 4,00</span></div>
+      </a>
+    </div>
+    <div class="prod-card sr" style="transition-delay:0.36s;margin-top:1rem;">
+      <a href="https://www.velvetroses.at/product-page/gro%C3%9Fe-wei%C3%9Fe-lilie-einzeln" target="_blank" style="text-decoration:none;color:inherit;">
+      <div class="prod-img">
+        <img src="https://static.wixstatic.com/media/87c1ff_03a4c79c904845d599163641246dc31c~mv2.jpg/v1/fill/w_400,h_300,al_c,q_80/photo.jpg" alt="Weiße Lilie" onerror="this.parentElement.style.background='#c8d4a8';this.parentElement.style.height='195px';this.remove()">
+        <div class="prod-heart">🤍</div>
+      </div>
+      <div class="prod-info"><h3>Weiße Lilie</h3><p class="prod-sub">Einzeln ab</p><span class="prod-price">€ 8,00</span></div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ══ NEWSLETTER ══ -->
+<section class="nl" id="contact">
+  <div class="sr">
+    <h2 class="nl-title wr"><span class="w">Bleiben</span>&nbsp;<span class="w">Sie</span>&nbsp;<span class="w"><em>inspiriert!</em></span></h2>
+    <p class="nl-sub">Taborstraße 39a · 1020 Wien · velvetroses1020@gmail.com</p>
+  </div>
+  <div class="sr" style="transition-delay:0.2s">
+    <div class="nl-form">
+      <input type="email" placeholder="Ihre E-Mail Adresse">
+      <button>Abonnieren →</button>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="foot-brand">
+    <a href="#" class="logo">VelvetRoses.</a>
+    <p>Ihr lokaler Blumenladen in Wien 1020. Premiumqualität, Lieferung am selben Tag, individuelle Arrangements für jeden Anlass.</p>
+  </div>
+  <div class="foot-col"><h4>Shop</h4><ul><li><a href="#">Alle Produkte</a></li><li><a href="#">Rosen</a></li><li><a href="#">Sträuße</a></li><li><a href="#">Hochzeit</a></li></ul></div>
+  <div class="foot-col"><h4>Info</h4><ul><li><a href="#">Über uns</a></li><li><a href="#">Lieferung</a></li><li><a href="#">Kontakt</a></li><li><a href="#">Galerie</a></li></ul></div>
+  <div class="foot-col"><h4>Rechtliches</h4><ul><li><a href="#">Impressum</a></li><li><a href="#">AGBs</a></li><li><a href="#">Datenschutz</a></li></ul></div>
+</footer>
+<div class="foot-bar"><span>© 2025 VelvetRoses Wien</span><span>Taborstraße 39a · 1020 Wien · +43 660 997 7699</span></div>
+
+<script>
+/* LOADER */
+'VelvetRoses.'.split('').forEach((c,i) => {
+  const s = document.createElement('span');
+  s.textContent = c === ' ' ? '\u00A0' : c;
+  s.style.animationDelay = (i * 0.055) + 's';
+  document.getElementById('lword').appendChild(s);
+});
+
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    document.getElementById('loader').classList.add('gone');
+    document.getElementById('nav').classList.add('on');
+    heroSequence();
+    petals();
+  }, 2000);
+});
+
+/* HERO SEQUENCE – exact Gardenia timing */
+function heroSequence() {
+  const T = (id, ms) => setTimeout(() => document.getElementById(id).classList.add('on'), ms);
+
+  // 1. Banner
+  T('hBanner', 0);
+  // 2. Swirl
+  T('hSwirl', 200);
+  // 3. Title words
+  setTimeout(() => wreveal(document.getElementById('hTitle'), 0), 200);
+  // 4. Left avatar row
+  T('hAvrow', 650);
+  // 5. Left photo card
+  T('hPhoto', 850);
+  // 6. ★ SPINNING ROSE ★
+  T('hRose', 950);
+  // 7. Right circles
+  T('hCircles', 1150);
+  // 8. Stats + counters
+  setTimeout(() => {
+    document.getElementById('hStats').classList.add('on');
+    document.querySelectorAll('.cnt').forEach(counter);
+  }, 1350);
+  // 9. Mid buttons
+  T('hMbtns', 1550);
+  // 10. CTA buttons
+  T('hActions', 1700);
+  // 11. Badge
+  T('hBadge', 1900);
+  // 12. Scroll arrow
+  T('hScroll', 2150);
+}
+
+/* SCROLL OBSERVER */
+const obs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (!e.isIntersecting) return;
+    const el = e.target;
+    if (el.classList.contains('sr')) el.classList.add('on');
+    if (el.classList.contains('wr')) wreveal(el, 0);
+    el.querySelectorAll('.cnt').forEach(counter);
+    obs.unobserve(el);
+  });
+}, { threshold: 0.12 });
+
+document.querySelectorAll('.features .sr, .features .wr, .cta .sr, .cta .wr, .products .sr, .products .wr, .nl .sr, .nl .wr').forEach(el => obs.observe(el));
+
+/* WORD REVEAL */
+function wreveal(container, base) {
+  container.querySelectorAll('.w').forEach((w, i) => {
+    setTimeout(() => w.classList.add('on'), base + i * 125);
+  });
+}
+
+/* COUNTER */
+function counter(el) {
+  if (el.dataset.done) return;
+  el.dataset.done = 1;
+  const target = parseInt(el.dataset.t);
+  const dur = 1600;
+  const t0 = performance.now();
+  (function step(now) {
+    const p = Math.min((now - t0) / dur, 1);
+    el.textContent = Math.floor((1 - Math.pow(1 - p, 3)) * target).toLocaleString('de-AT');
+    if (p < 1) requestAnimationFrame(step);
+    else el.textContent = target.toLocaleString('de-AT');
+  })(t0);
+}
+
+/* ══ SAISONALES SYSTEM ══ */
+
+const SEASONS = [
+  {
+    name: 'muttertag',
+    check: (d) => {
+      if (d.getMonth() !== 4) return false;
+      const secondSun = 8 + (7 - new Date(d.getFullYear(), 4, 1).getDay()) % 7;
+      return d.getDate() >= secondSun - 7 && d.getDate() <= secondSun + 2;
+    },
+    banner: '🌸 Muttertag – Lieferung am selben Tag',
+    heroBg: '#8B9A6E',
+    heroImg: 'https://images.unsplash.com/photo-1490750967868-88df5691166c?w=1600&q=80',
+    heroOverlay: 'rgba(60,80,40,0.45)',
+    accentBg: '#D4855A',
+    petal: '🌸',
+    titleLine1: 'Das schönste',
+    titleLine2: 'Geschenk für',
+    titleLine3: '<em>Mama.</em>'
+  },
+  {
+    name: 'valentinstag',
+    check: (d) => d.getMonth() === 1 && d.getDate() >= 10 && d.getDate() <= 14,
+    banner: '❤️ Valentinstag – Rosen für die Liebe',
+    heroBg: '#6B2737',
+    heroImg: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1600&q=80',
+    heroOverlay: 'rgba(80,10,30,0.55)',
+    accentBg: '#C0392B',
+    petal: '❤️',
+    titleLine1: 'Sagen Sie',
+    titleLine2: '<em>Ich liebe dich</em>',
+    titleLine3: 'mit Rosen.'
+  },
+  {
+    name: 'ostern',
+    check: (d) => (d.getMonth() === 2 && d.getDate() >= 20) || (d.getMonth() === 3 && d.getDate() <= 25),
+    banner: '🐣 Frohe Ostern – Frühlingsblumen jetzt',
+    heroBg: '#7A9E7E',
+    heroImg: 'https://images.unsplash.com/photo-1462275646964-a0e3386b89fa?w=1600&q=80',
+    heroOverlay: 'rgba(40,80,40,0.45)',
+    accentBg: '#E8A838',
+    petal: '🐣',
+    titleLine1: 'Frühling',
+    titleLine2: 'in vollen',
+    titleLine3: '<em>Blüten.</em>'
+  },
+  {
+    name: 'vatertag',
+    check: (d) => d.getMonth() === 4 && d.getDate() >= 25 && d.getDate() <= 31,
+    banner: '🎉 Vatertag – Blumen für Papa',
+    heroBg: '#4A6741',
+    heroImg: 'https://images.unsplash.com/photo-1448375240586-882707db888b?w=1600&q=80',
+    heroOverlay: 'rgba(20,50,20,0.55)',
+    accentBg: '#8B6914',
+    petal: '🎉',
+    titleLine1: 'Für den',
+    titleLine2: 'besten',
+    titleLine3: '<em>Papa.</em>'
+  },
+  {
+    name: 'pfingsten',
+    check: (d) => d.getMonth() === 5 && d.getDate() >= 1 && d.getDate() <= 15,
+    banner: '🌺 Pfingsten – Festliche Blumenarrangements',
+    heroBg: '#8B6E9A',
+    heroImg: 'https://images.unsplash.com/photo-1490750967868-88df5691166c?w=1600&q=80',
+    heroOverlay: 'rgba(60,30,80,0.45)',
+    accentBg: '#C4855A',
+    petal: '🌺',
+    titleLine1: 'Festliche',
+    titleLine2: '<em>Blumen</em>',
+    titleLine3: 'zu Pfingsten.'
+  },
+  {
+    name: 'weihnachten',
+    check: (d) => d.getMonth() === 11 && d.getDate() >= 1 && d.getDate() < 28,
+    banner: '🎄 Weihnachten – Festliche Arrangements',
+    heroBg: '#2C4A2E',
+    heroImg: 'https://images.unsplash.com/photo-1543589077-47d81606c1bf?w=1600&q=80',
+    heroOverlay: 'rgba(10,30,15,0.6)',
+    accentBg: '#8B1A1A',
+    petal: '❄️',
+    titleLine1: 'Weihnachten',
+    titleLine2: 'mit echten',
+    titleLine3: '<em>Blumen.</em>'
+  },
+  {
+    name: 'silvester',
+    check: (d) => d.getMonth() === 11 && d.getDate() >= 28,
+    banner: '🎆 Silvester – Blumen für die Party',
+    heroBg: '#1A1A3A',
+    heroImg: 'https://images.unsplash.com/photo-1467810563316-b5476525c0f9?w=1600&q=80',
+    heroOverlay: 'rgba(10,10,40,0.6)',
+    accentBg: '#C4A020',
+    petal: '🎆',
+    titleLine1: 'Starten Sie',
+    titleLine2: 'das neue Jahr',
+    titleLine3: '<em>mit Blumen.</em>'
+  }
+];
+
+function getSeason() {
+  const now = new Date();
+  const found = SEASONS.find(s => s.check(now));
+  if (found) return found;
+
+  const m = now.getMonth();
+  if (m >= 2 && m <= 4) return {
+    name:'standard', banner:'🌸 Frische Frühlingsblumen – täglich neu',
+    heroBg:'#8B9A6E',
+    heroImg:'https://images.unsplash.com/photo-1490750967868-88df5691166c?w=1600&q=80',
+    heroOverlay:'rgba(50,70,30,0.45)',
+    accentBg:'#D4855A', petal:'🌸',
+    titleLine1:'Blumen,', titleLine2:'die', titleLine3:'<em>Herzen</em> berühren.'
+  };
+  if (m >= 5 && m <= 7) return {
+    name:'standard', banner:'🌻 Sommerblumen – frisch & bunt',
+    heroBg:'#7A9E4A',
+    heroImg:'https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=1600&q=80',
+    heroOverlay:'rgba(30,70,10,0.45)',
+    accentBg:'#E8A838', petal:'🌻',
+    titleLine1:'Sommer,', titleLine2:'<em>Blumen</em>', titleLine3:'& Freude.'
+  };
+  if (m >= 8 && m <= 10) return {
+    name:'standard', banner:'🍂 Herbstliche Arrangements – jetzt bestellen',
+    heroBg:'#8B6E4A',
+    heroImg:'https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=1600&q=80',
+    heroOverlay:'rgba(60,30,10,0.5)',
+    accentBg:'#C4601A', petal:'🍂',
+    titleLine1:'Herbst', titleLine2:'in vollen', titleLine3:'<em>Farben.</em>'
+  };
+  return {
+    name:'standard', banner:'❄️ Winterblumen – warm & elegant',
+    heroBg:'#4A6A8B',
+    heroImg:'https://images.unsplash.com/photo-1491002052546-bf38f186af56?w=1600&q=80',
+    heroOverlay:'rgba(10,20,50,0.55)',
+    accentBg:'#8B1A2A', petal:'❄️',
+    titleLine1:'Winter,', titleLine2:'warm &', titleLine3:'<em>elegant.</em>'
+  };
+}
+
+function applySeason() {
+  const s = getSeason();
+  const hero = document.querySelector('.hero');
+
+  // Hero background – Bild wenn vorhanden, sonst Farbe
+  if (s.heroImg) {
+    hero.style.background = s.heroBg;
+    hero.style.position = 'relative';
+
+    // Preload image then apply
+    const img = new Image();
+    img.onload = () => {
+      hero.style.backgroundImage = `linear-gradient(${s.heroOverlay || 'rgba(0,0,0,0.4)'}, ${s.heroOverlay || 'rgba(0,0,0,0.4)'}), url('${s.heroImg}')`;
+      hero.style.backgroundSize = 'cover';
+      hero.style.backgroundPosition = 'center';
+      hero.style.backgroundRepeat = 'no-repeat';
+    };
+    img.src = s.heroImg;
+  } else {
+    hero.style.background = s.heroBg;
+    hero.style.backgroundImage = 'none';
+  }
+
+  // CTA section color
+  document.querySelector('.cta').style.background = s.accentBg;
+  document.documentElement.style.setProperty('--sage', s.heroBg);
+  document.documentElement.style.setProperty('--orange', s.accentBg);
+
+  // Banner text
+  const banner = document.getElementById('hBanner');
+  if (banner) banner.textContent = s.banner;
+
+  // Title
+  const title = document.getElementById('hTitle');
+  if (title) {
+    title.innerHTML =
+      '<span class="w">' + s.titleLine1 + '</span>&nbsp;' +
+      '<span class="w">' + s.titleLine2 + '</span>&nbsp;' +
+      '<span class="w">' + s.titleLine3 + '</span>';
+  }
+
+  return s;
+}
+
+/* ══ JAHRESZEIT ══ */
+function getSeason_time() {
+  const m = new Date().getMonth();
+  if (m >= 2 && m <= 4) return { name:'fruehling', petals:['🌸','🌷','🌼'], color:'#8B9A6E' };
+  if (m >= 5 && m <= 7) return { name:'sommer',    petals:['🌻','🌺','🌸'], color:'#7A9E4A' };
+  if (m >= 8 && m <= 10) return { name:'herbst',   petals:['🍂','🍁','🌾'], color:'#8B6E4A' };
+  return { name:'winter', petals:['❄️','⭐','🌟'], color:'#4A6A8B' };
+}
+
+/* PETALS – Feiertag hat Vorrang, sonst Jahreszeit */
+function petals() {
+  const s = getSeason();
+  const st = getSeason_time();
+
+  // Feiertag-spezifische Blumen
+  const holidayPetals = {
+    muttertag:   ['🌹','🌸','🌷'],
+    valentinstag:['❤️','🌹','💕'],
+    ostern:      ['🌷','🐣','🌸'],
+    vatertag:    ['🌿','💐','🌱'],
+    pfingsten:   ['🌿','🍃','🌺'],  // Birkengrün + Päonie
+    weihnachten: ['❄️','⭐','🎄'],
+    silvester:   ['🎆','⭐','✨'],
+    standard:    st.petals
+  };
+
+  const emojis = holidayPetals[s.name] || st.petals;
+
+  for (let i = 0; i < 12; i++) {
+    setTimeout(() => {
+      const p = document.createElement('div');
+      p.className = 'petal';
+      p.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+      p.style.left = Math.random() * 100 + 'vw';
+      p.style.fontSize = (0.7 + Math.random() * 0.9) + 'rem';
+      p.style.animationDuration = (6 + Math.random() * 8) + 's';
+      p.style.animationDelay = Math.random() * 4 + 's';
+      document.body.appendChild(p);
+      setTimeout(() => p.remove(), 20000);
+    }, i * 700);
+  }
+}
+
+// Apply season immediately on load
+applySeason();
+
+/* MOBILE STATS */
+if (window.innerWidth <= 768) {
+  const ms = document.getElementById('hMobileStats');
+  if (ms) { ms.style.display = 'flex'; ms.style.gap = '2rem'; ms.style.marginTop = '1.5rem'; }
+}
+
+/* HEARTS */
+document.querySelectorAll('.prod-heart').forEach(h => {
+  h.addEventListener('click', e => { e.stopPropagation(); h.textContent = h.textContent === '🤍' ? '❤️' : '🤍'; });
+});
+
+
+/* ══ 3D ROSE ══ */
+function init3DRose() {
+  const canvas = document.getElementById('roseCanvas');
+  if (!canvas) return;
+  if (typeof THREE === 'undefined') { console.error('THREE not loaded'); return; }
+
+  const w = canvas.parentElement.offsetWidth || 400;
+  const h = canvas.parentElement.offsetHeight || 360;
+
+  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+  renderer.setSize(w, h);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(45, w / h, 0.1, 100);
+  camera.position.set(0, 0.5, 3.5);
+
+  scene.add(new THREE.AmbientLight(0xffffff, 1.5));
+  const dir = new THREE.DirectionalLight(0xfff0e0, 2.5);
+  dir.position.set(2, 4, 3); scene.add(dir);
+  const fill = new THREE.DirectionalLight(0xe8d0c0, 1);
+  fill.position.set(-2, 1, -2); scene.add(fill);
+
+  const loader = new THREE.GLTFLoader();
+  const base = window.location.href.replace(/\/[^/]*$/, '/');
+  loader.load(base + 'rose.glb', (gltf) => {
+    const model = gltf.scene;
+    const box = new THREE.Box3().setFromObject(model);
+    const center = box.getCenter(new THREE.Vector3());
+    const size = box.getSize(new THREE.Vector3());
+    model.position.sub(center);
+    model.scale.setScalar(2.2 / Math.max(size.x, size.y, size.z));
+    model.rotation.y = -Math.PI;
+    scene.add(model);
+    canvas.style.opacity = '1';
+
+    const t0 = performance.now();
+    const spinDur = 1500;
+    function animate(now) {
+      const p = Math.min((now - t0) / spinDur, 1);
+      model.rotation.y = -Math.PI + Math.PI * (1 - Math.pow(1-p, 3));
+      renderer.render(scene, camera);
+      if (p < 1) { requestAnimationFrame(animate); return; }
+      model.rotation.y = 0;
+      let angle = 0;
+      (function loop() {
+        angle += 0.005; model.rotation.y = angle;
+        renderer.render(scene, camera);
+        requestAnimationFrame(loop);
+      })();
+      setTimeout(() => {
+        canvas.style.opacity = '0';
+        const photo = document.getElementById('rosePhoto');
+        if (photo) photo.style.opacity = '1';
+      }, 2500);
+    }
+    requestAnimationFrame(animate);
+  }, undefined, (err) => console.error('GLB error:', err));
+}
+
+/* ══ CLICK MAGIC – saisonale Elemente beim Klicken ══ */
+const CLICK_ITEMS = {
+  muttertag:    ['🌹','🌸','🌷','💐'],
+  valentinstag: ['❤️','💕','🌹','💖'],
+  ostern:       ['🐰','🥚','🌷','🐣'],
+  vatertag:     ['💐','🌿','🌱','🍀'],
+  pfingsten:    ['🌺','🍃','🌿','🌸'],
+  weihnachten:  ['❄️','⭐','🎄','🎁'],
+  silvester:    ['🎆','✨','⭐','🎉'],
+  standard:     ['🌸','🌹','🌷','💐']
+};
+
+document.addEventListener('click', (e) => {
+  // Nicht auf Buttons, Links, Inputs oder Herzen
+  if (e.target.closest('a, button, input, .prod-heart, nav, .nl-form')) return;
+
+  const s = getSeason();
+  const items = CLICK_ITEMS[s.name] || CLICK_ITEMS.standard;
+  const emoji = items[Math.floor(Math.random() * items.length)];
+
+  const el = document.createElement('div');
+  el.textContent = emoji;
+  el.style.cssText = `
+    position: fixed;
+    left: ${e.clientX - 20}px;
+    top: ${e.clientY - 20}px;
+    font-size: 2rem;
+    pointer-events: none;
+    z-index: 9999;
+    transform: scale(0) rotate(-30deg);
+    transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1), opacity 0.4s ease;
+    opacity: 1;
+  `;
+  document.body.appendChild(el);
+
+  // Animate in
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      el.style.transform = 'scale(1) rotate(0deg)';
+    });
+  });
+
+  // Animate out
+  setTimeout(() => {
+    el.style.opacity = '0';
+    el.style.transform = 'scale(0.5) translateY(-30px) rotate(20deg)';
+    setTimeout(() => el.remove(), 400);
+  }, 800);
+});
+</script>
+</body>
+</html>
